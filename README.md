@@ -7,7 +7,7 @@ Course Assignment for Machine Learning Application Development
 python -m venv .venv
 
 ### 2: Activate environment
-Windows: .venv\Scripts\activate
+Windows: .venv\Scripts\activate <br>
 MacOS: source .venv/bin/activate
 
 ### 3: Install packages
