@@ -1,0 +1,15 @@
+//// About the files in this folder
+
+/// 00-00-template-CNN-test-BETTER.ipynb
+
+Test Loss: 0.40689772367477417
+Test Accuracy: 0.9090909361839294
+Test Precision: 0.9090909361839294
+Test Recall: 0.9090909361839294
+
+/// 00-03-template-CNN-test-BEST-LowerTestLoss.ipynb
+
+Test Loss: 0.3055042326450348
+Test Accuracy: 0.9090909361839294
+Test Precision: 0.9259259104728699
+Test Recall: 0.9090909361839294

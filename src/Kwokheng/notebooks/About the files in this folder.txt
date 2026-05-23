@@ -1,0 +1,106 @@
+//// About the files in notebooks folder
+
+/// 00-00-template-CNN.ipynb
+
+The first notebook I started with.
+
+# epoch = 20
+# batch size = 16
+# uses default learning rate (no specific setting on 'adam'): 0.001
+# RandAugment factor = 0.4
+
+/// 00-01-LowerLR-template-CNN.ipynb
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# batch size = 16
+# RandAugment factor = 0.4
+
+// Adjustments
+
+# epoch = 30 (change from epoch = 20 of 00-00-template-CNN)
+# Main adjustment: change to learning_rate=0.0005, default learning rate was 0.001
+
+/// 00-03-template-CNN
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# batch size = 16
+# learning_rate=0.001 (default rate)
+# RandAugment = 0.4
+
+// Adjustments
+
+# epoch = 30 (change from epoch = 20 of 00-00-template-CNN, but no change from 00-01-template-CNN)
+# Main adjustment 1: Add Dropout layer of 0.30 
+
+/// 00-03a1—IncreaseEpoch-template-CNN.ipynb
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# batch size = 16
+# learning_rate=0.001 (default rate)
+# RandAugment = 0.4
+
+// Adjustments
+
+# Main adjustment 1: Add Dropout layer of 0.30
+# Main adjustment 2: Increase epoch = 50, previously 30
+
+/// 00-03b-Drop35-template-CNN.ipynb
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# batch size = 16
+# learning_rate=0.001 (default rate)
+# RandAugment = 0.4
+
+// Adjustments
+
+# Main adjustment: Add Dropout layer of 0.35 (up from 0.30 in 00-03a1—IncreaseEpoch-template-CNN.ipynb)
+# epoch = 30 (change from epoch = 20 of 00-00-template-CNN, but no change from 00-01-template-CNN)
+
+/// 00-03c-Drop40-template-CNN.ipynb
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# batch size = 16
+# learning_rate=0.001 (default rate)
+# RandAugment = 0.4
+
+// Adjustments
+
+# Main adjustment: Add Dropout layer of 0.40 (up from 0.35 in 00-03b-Drop35-template-CNN.ipynb)
+
+/// 00-03d-template-CNN.ipynb
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# epoch = 30 (change from epoch = 20 of 00-00-template-CNN, but no change from 00-01-template-CNN)
+# batch size = 16
+# learning_rate=0.001 (default rate)
+# RandAugment = 0.4
+
+// Adjustments
+
+# Main adjustment: Add Dropout layer of 25% (down from 0.30 in the first file with Dropout, in 00-03a1—IncreaseEpoch-template-CNN.ipynb)
+
+/// 00-04-template-CNN.ipynb
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# epoch = 30 (change from epoch = 20 of 00-00-template-CNN, but no change from 00-01-template-CNN)
+# batch size = 16
+# learning_rate=0.001 (default rate)
+
+# Main adjustment: Add Dropout layer of 30% AND RandAugment factor = 0.25
+
+///	 00-05-Drop&LR-template-CNN.ipynb
+
+// Same as 00-00-template-CNN.ipynb (the first base file):
+
+# epoch = 30 (change from epoch = 20 of 00-00-template-CNN, but no change from 00-01-template-CNN)
+# batch size = 16
+
+// Adjustments
+# Main adjustment: Add Dropout layer of 30% AND learning rate = 0.005
