@@ -12,6 +12,9 @@ Also, both models have an early_stop applied:
 
 /// 00-00-template-CNN-test-BETTER.ipynb
 
+[Note: I noticed that this model's training and validation metrics are not as repeatable as 
+the BEST model, so I suggest you skip looking at this model, while I try to test my other models]
+
 Test Loss: 0.40689772367477417
 Test Accuracy: 0.9090909361839294
 Test Precision: 0.9090909361839294
@@ -26,6 +29,17 @@ Test Recall: 0.9090909361839294
     RandAugment layer factor = 0.4
 
 /// 00-03-template-CNN-test-BEST-LowerTestLoss.ipynb
+
+At Epoch 25/40:
+11/11 ━━━━━━━━━━━━━━━━━━━━ 1s 129ms/step 
+- accuracy: 0.8466 
+- loss: 0.4344 
+- precision: 0.8690 
+- recall: 0.8295 
+- val_accuracy: 0.9773 
+- val_loss: 0.1718 
+- val_precision: 0.9767 
+- val_recall: 0.9545
 
 Test Loss: 0.3055042326450348
 Test Accuracy: 0.9090909361839294
