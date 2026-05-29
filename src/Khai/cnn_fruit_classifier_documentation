@@ -1,0 +1,64 @@
+![alt text](image.png)
+
+Baseline Experiment Analysis:
+Final Test Loss : 0.5546
+Final Test Accuracy : 0.9273
+
+With reference to the generated plots for 20-epoch run:
+Overall Performance:
+The model performs reasonably well on the raw data, eventually reaching over 90% validation accuracy.
+
+Mid-Training Instability:
+There is a distinct disruption around epoch 11-12. The training loss spikes sharply, and accuracy temporarily drops.
+
+Signs of Overfitting:
+By epochs 18-20, training accuracy approaches perfect 1.0, while validation accuracy plateaus slightly below it.
+The training loss also drops clearly below the validation loss which suggest that the model is starting to memorize the specific training images, indicationn of overfitting.
+
+![alt text](image-1.png)
+
+Augmented Data Experiment Analysis:
+Final Test Loss : 0.2621
+Final Test Accuracy : 0.9455
+
+With reference to the generated plots for 20-epoch run:
+Improved Generalization:
+In the baseline, training accuracy approached 1.0 while validation accuracy plateaued.
+In this augmented run, training and validation accuracy track each other almost perfectly through epoch 20, both finishing strongly above 95%.
+
+Resolved Overfitting:
+The training loss no longer significantly undercuts the validation loss.
+Both metrics converge tightly at the end of the run, confirming the model is learning generalized features of the fruits rather than memorizing the training dataset.
+
+Expected Training Volatility:
+There is significant volatility in the validation loss (particularly the sharp spike around epoch 12) and minor dips in accuracy.
+This is the expected trade-off when using RandomHorizontalFlip, RandomRotation, and ColorJitter.
+Because the model evaluates "new" variations of the images every epoch, the learning path is noisier, but the resulting model is undeniably more robust.
+
+Initial Conclusion: The application of image augmentation directly improved the model's ability to generalize to unseen data, successfully resolving the late-stage overfitting seen in the baseline configuration.
+
+![alt text](image-2.png)
+
+Transfer Learning Experiment Analysis:
+Final Test Loss : 0.0031
+Final Test Accuracy : 1.0000
+
+With reference to the generated plots for 20-epoch run:
+Immediate Convergence:
+The most prominent feature of this run is that validation accuracy starts at approximately 1.0 (100%) on Epoch 1 and remains completely flat.
+Training accuracy catches up by Epoch 2. This proves your hypothesis: the model did not need to spend time learning basic shapes or edges.
+
+Feature Extraction Efficacy:
+Because MobileNetV2 was pre-trained on ImageNet, it already possessed highly optimized feature maps for identifying natural objects.
+The only parameters being trained were the small custom classification head.
+It took precisely one pass over the data to map those pre-learned features to your specific "Apple," "Orange," and "Banana" labels.
+
+Absence of Overfitting:
+Both training and validation loss drop to near-zero and remain tightly coupled throughout the 20 epochs.
+There is no divergence, meaning the frozen base model successfully prevented the network from memorizing the training dataset.
+
+Final Conclusion:
+The transfer learning experiment drastically outperformed the custom-built CNN.
+While the custom model with data augmentation required roughly 15-20 epochs to stabilize above 95% accuracy,
+the pre-trained MobileNetV2 architecture achieved near-perfect accuracy and stabilization by Epoch 2,
+proving the efficiency of leveraging pre-learned feature extractors for standard classification tasks.
