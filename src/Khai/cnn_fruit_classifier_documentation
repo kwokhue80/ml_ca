@@ -1,64 +1,121 @@
+Documentation_v1.0
+1. Baseline Parameters
+The core configuration applied across all experiments unless otherwise specified:
+
+a. Target Image Size: Dynamically initialized to a minimum of 224 x 224 based on the dataset's median dimensions.
+b. Data Split: 80% Training / 20% Validation, stratified by class labels to maintain distribution.
+c. Test Transformations: Standardized resizing and center cropping. No artificial augmentation applied to test data.
+d. Training Duration: 20 Epochs.
+
+2. Experiment 1: Baseline Architecture
 ![alt text](image.png)
 
-Baseline Experiment Analysis:
-Final Test Loss : 0.5546
-Final Test Accuracy : 0.9273
+Methodology: 
+    The baseline model utilizes a custom 3-block Convolutional Neural Network (CNN) architecture. 
+    Each block consists of a Conv2D layer (32, 64, and 128 filters respectively) paired with MaxPooling2D for downsampling. 
+    The network concludes with a flattened dense layer of 128 nodes, a 50% dropout rate for basic regularization, 
+    and a 3-node softmax output. Basic resizing and cropping were applied to the training data.
 
-With reference to the generated plots for 20-epoch run:
-Overall Performance:
-The model performs reasonably well on the raw data, eventually reaching over 90% validation accuracy.
+Results:
+    Final Test Loss: 0.5546
+    Final Test Accuracy: 0.9273
 
-Mid-Training Instability:
-There is a distinct disruption around epoch 11-12. The training loss spikes sharply, and accuracy temporarily drops.
+Analysis:
+    Overall Performance: The baseline model performs adequately on raw data, achieving a validation accuracy of over 90%.
+    Mid-Training Instability: Training exhibits volatility, notably around epochs 11–12, where training loss spikes and accuracy temporarily drops.
+    Signs of Overfitting: By epochs 18–20, training accuracy reaches 1.0 while validation accuracy plateaus. 
+                            The divergence between the decreasing training loss and the plateauing validation loss 
+                            indicates the model is beginning to memorize the training data rather than generalizing.
 
-Signs of Overfitting:
-By epochs 18-20, training accuracy approaches perfect 1.0, while validation accuracy plateaus slightly below it.
-The training loss also drops clearly below the validation loss which suggest that the model is starting to memorize the specific training images, indicationn of overfitting.
-
+3. Experiment 2: Data Augmentation
 ![alt text](image-1.png)
 
-Augmented Data Experiment Analysis:
-Final Test Loss : 0.2621
-Final Test Accuracy : 0.9455
+Methodology:
+    To combat the overfitting observed in the baseline, dynamic image augmentation was introduced 
+    to the training dataset. The model architecture remains identical to the baseline.
 
-With reference to the generated plots for 20-epoch run:
-Improved Generalization:
-In the baseline, training accuracy approached 1.0 while validation accuracy plateaued.
-In this augmented run, training and validation accuracy track each other almost perfectly through epoch 20, both finishing strongly above 95%.
+Key Code Modification:
+train_transforms = transforms.Compose([
+    transforms.Resize(256),
+    transforms.RandomHorizontalFlip(p=0.5),
+    transforms.RandomRotation(degrees=60),
+    transforms.ColorJitter(brightness=0.2),
+    transforms.CenterCrop((target_height, target_width)),
+    transforms.ToTensor()
+])
 
-Resolved Overfitting:
-The training loss no longer significantly undercuts the validation loss.
-Both metrics converge tightly at the end of the run, confirming the model is learning generalized features of the fruits rather than memorizing the training dataset.
+Results:
+    Final Test Loss : 0.2621
+    Final Test Accuracy : 0.9455
 
-Expected Training Volatility:
-There is significant volatility in the validation loss (particularly the sharp spike around epoch 12) and minor dips in accuracy.
-This is the expected trade-off when using RandomHorizontalFlip, RandomRotation, and ColorJitter.
-Because the model evaluates "new" variations of the images every epoch, the learning path is noisier, but the resulting model is undeniably more robust.
+Analysis:
+    Improved Generalization: Unlike the baseline, training and validation accuracy track each other 
+                                closely throughout the 20 epochs, both finishing above 95%.
+    Resolved Overfitting: Training loss no longer significantly undercuts validation loss. 
+                            The tight convergence at the end of the run confirms the model is learning 
+                            generalizable features rather than memorizing exact pixel layouts.
+    Expected Volatility: The validation loss exhibits expected short-term volatility (e.g., epoch 12). 
+                            Because the model evaluates newly mutated variations of the images every epoch, 
+                            the learning curve is noisier, but the resulting classifier is significantly more robust.
 
-Initial Conclusion: The application of image augmentation directly improved the model's ability to generalize to unseen data, successfully resolving the late-stage overfitting seen in the baseline configuration.
+Conclusion: The application of image augmentation directly improved the model's ability to generalize to unseen data, 
+            successfully resolving the late-stage overfitting seen in the baseline.
 
+4. Experiment 3: Transfer Learning
 ![alt text](image-2.png)
 
-Transfer Learning Experiment Analysis:
-Final Test Loss : 0.0031
-Final Test Accuracy : 1.0000
+Methodology:
+    This experiment discards the custom CNN architecture in favor of a pre-trained MobileNetV2 model. 
+    The base model weights (trained on ImageNet) were frozen, acting as an optimized feature extractor. 
+    Only a new, custom dense classification head was trained. The data augmentation strategy from Experiment 2 was retained.
 
-With reference to the generated plots for 20-epoch run:
-Immediate Convergence:
-The most prominent feature of this run is that validation accuracy starts at approximately 1.0 (100%) on Epoch 1 and remains completely flat.
-Training accuracy catches up by Epoch 2. This proves your hypothesis: the model did not need to spend time learning basic shapes or edges.
+Key Code Modification:
+keras.config.set_image_data_format('channels_first')
+base_model = keras.applications.MobileNetV2(
+    input_shape=(3, 224, 224), 
+    include_top=False, 
+    weights='imagenet'
+)
 
-Feature Extraction Efficacy:
-Because MobileNetV2 was pre-trained on ImageNet, it already possessed highly optimized feature maps for identifying natural objects.
-The only parameters being trained were the small custom classification head.
-It took precisely one pass over the data to map those pre-learned features to your specific "Apple," "Orange," and "Banana" labels.
+base_model.trainable = False
 
-Absence of Overfitting:
-Both training and validation loss drop to near-zero and remain tightly coupled throughout the 20 epochs.
-There is no divergence, meaning the frozen base model successfully prevented the network from memorizing the training dataset.
+model = keras.Sequential([
+    keras.layers.Input(shape=(3, 224, 224)),
+    
+    # Preprocessing: MobileNetV2 expects pixel values between [-1, 1].
+    # Your PyTorch ToTensor() outputs [0, 1], so we scale it here automatically.
+    keras.layers.Rescaling(scale=2.0, offset=-1.0),
+    
+    # Pass the scaled images through the frozen MobileNetV2 base
+    base_model,
+    
+    # Compress the spatial dimensions while retaining feature depth.
+    # Crucial: specify channels_first to maintain PyTorch backend compatibility.
+    keras.layers.GlobalAveragePooling2D(data_format="channels_first"),
+    
+    # Add your custom dense layers for the 3 fruit classes
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dropout(0.5),
+    keras.layers.Dense(3, activation='softmax')
+])
+
+Results:
+    Final Test Loss: 0.0031
+    Final Test Accuracy: 1.0000
+
+Analysis:
+    Immediate Convergence: Validation accuracy starts at approximately 1.0 on Epoch 1 and remains flat, 
+                            with training accuracy aligning by Epoch 2. The model did not require time 
+                            to learn fundamental visual features like edges or shapes.
+    Feature Extraction Efficacy: Because MobileNetV2 already possessed highly optimized feature maps for 
+                                    identifying natural objects, it took precisely one pass over the data 
+                                    to map these pre-learned features to the specific fruit classes.
+    Absence of Overfitting: Both training and validation loss drop to near-zero and remain tightly coupled. 
+                            The frozen base model successfully prevented network memorization.
 
 Final Conclusion:
-The transfer learning experiment drastically outperformed the custom-built CNN.
-While the custom model with data augmentation required roughly 15-20 epochs to stabilize above 95% accuracy,
-the pre-trained MobileNetV2 architecture achieved near-perfect accuracy and stabilization by Epoch 2,
-proving the efficiency of leveraging pre-learned feature extractors for standard classification tasks.
+    The transfer learning approach drastically outperformed the custom-built CNN. 
+    While the custom model (even with augmentation) required 15–20 epochs to stabilize at ~95% accuracy, 
+    the pre-trained MobileNetV2 architecture achieved near-perfect accuracy and stabilization by Epoch 2. 
+    This proves the extreme efficiency and operational superiority of leveraging pre-trained feature 
+    extractors for standard image classification tasks.
