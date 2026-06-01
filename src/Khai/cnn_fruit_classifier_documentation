@@ -119,3 +119,6 @@ Final Conclusion:
     the pre-trained MobileNetV2 architecture achieved near-perfect accuracy and stabilization by Epoch 2. 
     This proves the extreme efficiency and operational superiority of leveraging pre-trained feature 
     extractors for standard image classification tasks.
+
+5. Additional Experiment to Consider:
+    Other Pre-Trained Models --> EfficientNetB0, ResNet50, VGG16
